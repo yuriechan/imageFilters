@@ -2,11 +2,17 @@ from tkinter import *
 from tkinter import filedialog
 from PIL import ImageTk, Image
 from filters import *
+import numpy as np
 
 IMAGE_WIDTH, IMAGE_HEIGHT = 400, 400
+R = 0
+G = 1
+B = 2
 
 root = Tk()
 root.title("Image Filter")
+root.geometry("750x750")
+my_image = None
 
 def open_finder():
     global my_image
@@ -20,9 +26,33 @@ def open_finder():
     final_image = ImageTk.PhotoImage(my_image)
     final_image_label = Label(image=final_image)
     final_image_label.image = final_image
-    final_image_label.pack()
+    final_image_label.place(rely="0.1", relx="0.5", anchor=N)
+
+def clamp(num):
+    num = int(num)
+    if num < 0:
+        return 0
+    if num >= 256:
+        return 255
+    return num
+
+def code_in_place_filter():
+     print("You pressed Submit!")
+     copied_image = my_image.copy()
+     pixels = np.array(copied_image).astype(np.float)
+     for x in range(copied_image.height):
+        for y in range(copied_image.width):
+            pixels[x, y, R] = clamp(pixels[x, y, R] * 1.5)
+            pixels[x, y, G] = clamp(pixels[x, y, G] * 0.7)
+            pixels[x, y, B] = clamp(pixels[x, y, B] * 1.5)
+
+     filtered_image = Image.fromarray(pixels.astype(np.uint8))
+     filtered_image.save("result.png")
 
 
-my_btn = Button(root, text="Open finder", command=open_finder).pack()
+my_btn = Button(root, text="Open finder", command=open_finder).place(relx="0.5", anchor=N)
+filter_btn = Button(root, text="CodeInPlace", command=code_in_place_filter).place(relx="0.3", rely="0.9", anchor=N)
+
+
 
 root.mainloop()
