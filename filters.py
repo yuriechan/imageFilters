@@ -44,6 +44,8 @@ class Application:
         return image.resize((IMAGE_WIDTH, new_height), Image.ANTIALIAS)
 
     def sepia_filter(self):
+        if self.filtered_image is None:
+            return
         copied_image = self.resized_image.copy()
         pixels = np.array(copied_image).astype(np.float)
         for x in range(copied_image.height):
@@ -62,6 +64,8 @@ class Application:
 
 
     def gray_scale_filter(self):
+        if self.filtered_image is None:
+            return
         copied_image = self.resized_image.copy()
         pixels = np.array(copied_image).astype(np.float)
         for x in range(copied_image.height):
@@ -81,6 +85,8 @@ class Application:
 
 
     def code_in_place_filter(self):
+        if self.filtered_image is None:
+            return
         copied_image = self.resized_image.copy()
         pixels = np.array(copied_image).astype(np.float)
         for x in range(copied_image.height):
@@ -93,6 +99,8 @@ class Application:
         self.replace_image_in_widget(self.filtered_image)
 
     def no_filter(self):
+        if self.resized_image is None:
+            return
         self.replace_image_in_widget(self.resized_image)
 
     def replace_image_in_widget(self, image):
@@ -101,6 +109,8 @@ class Application:
         self.final_image_label.image = self.filtered_photo
 
     def save_to_repo(self):
+        if self.filtered_image is None:
+            return 
         image_name = "image_" + str(self.saved_image_counter) + ".jpg"
         file_path = os.path.join('filtered_image/', image_name)
         self.filtered_image.save(file_path, "JPEG")
