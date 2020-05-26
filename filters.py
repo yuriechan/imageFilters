@@ -20,6 +20,7 @@ class Application:
         self.saved_image_counter = 0
 
         self.select_image_btn = Button(master, text="Open finder", command=self.open_finder).place(relx="0.5", anchor=N)
+        self.no_filter_btn = Button(master, text="Original", command=self.no_filter).place(relx="0.2", rely="0.9", anchor=N)
         self.code_in_place_filter_btn = Button(master, text="CodeInPlace", command=self.code_in_place_filter).place(relx="0.3", rely="0.9", anchor=N)
         self.save_filtered_image_btn = Button(master, text="Save", command=self.save_to_repo).place(relx="0.6", anchor=N)        
 
@@ -50,7 +51,13 @@ class Application:
                 pixels[x, y, B] = self.clamp(pixels[x, y, B] * 1.5)
 
         self.filtered_image = Image.fromarray(pixels.astype(np.uint8))
-        self.filtered_photo = ImageTk.PhotoImage(self.filtered_image)
+        self.replace_image_in_widget(self.filtered_image)
+
+    def no_filter(self):
+        self.replace_image_in_widget(self.resized_image)
+
+    def replace_image_in_widget(self, image):
+        self.filtered_photo = ImageTk.PhotoImage(image)
         self.final_image_label.configure(image=self.filtered_photo)
         self.final_image_label.image = self.filtered_photo
 
