@@ -22,6 +22,7 @@ class Application:
         self.select_image_btn = Button(master, text="Open finder", command=self.open_finder).place(relx="0.5", anchor=N)
         self.no_filter_btn = Button(master, text="Original", command=self.no_filter).place(relx="0.2", rely="0.9", anchor=N)
         self.code_in_place_filter_btn = Button(master, text="CodeInPlace", command=self.code_in_place_filter).place(relx="0.3", rely="0.9", anchor=N)
+        self.grayscale_filter_btn = Button(master, text="Gray Scale", command=self.gray_scale_filter).place(relx="0.4", rely="0.9", anchor=N)
         self.save_filtered_image_btn = Button(master, text="Save", command=self.save_to_repo).place(relx="0.6", anchor=N)        
 
     def open_finder(self):
@@ -40,6 +41,25 @@ class Application:
         width_percent = IMAGE_WIDTH / float(image_width)
         new_height = int(float(image_height) * float(width_percent))
         return image.resize((IMAGE_WIDTH, new_height), Image.ANTIALIAS)
+
+    def gray_scale_filter(self):
+        copied_image = self.resized_image.copy()
+        pixels = np.array(copied_image).astype(np.float)
+        for x in range(copied_image.height):
+            for y in range(copied_image.width):
+                total = 0
+                total += pixels[x, y, R]
+                total += pixels[x, y, G]
+                total += pixels[x, y, B]
+
+                ave = round(total / 3)
+                pixels[x, y, R] = ave
+                pixels[x, y, G] = ave
+                pixels[x, y, B] = ave
+
+        self.filtered_image = Image.fromarray(pixels.astype(np.uint8))
+        self.replace_image_in_widget(self.filtered_image)
+
 
     def code_in_place_filter(self):
         copied_image = self.resized_image.copy()
