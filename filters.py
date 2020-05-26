@@ -10,13 +10,14 @@ R, G, B = 0, 1, 2
 class Application:
     def __init__(self, master):
         self.select_image_btn = Button(master, text="Open finder", command=self.open_finder).place(relx="0.5", anchor=N)
-        #self.code_in_app_filter_btn = Button(master, text="CodeInPlace", command=code_in_place_filter).place(relx="0.3", rely="0.9", anchor=N)
+        self.code_in_place_filter_btn = Button(master, text="CodeInPlace", command=self.code_in_place_filter).place(relx="0.3", rely="0.9", anchor=N)
 
         self.master = master
         self.selected_image = None
         self.resized_image = None
         self.final_image = None
         self.final_image_label = None
+        self.filtered_image = None
 
     def open_finder(self):
         self.master.filename = filedialog.askopenfilename(initialdir="/", title="Select your favorite picture", filetypes=(("png files", "*.png"),("jpg files", "*.jpg")))
@@ -34,6 +35,29 @@ class Application:
         width_percent = IMAGE_WIDTH / float(image_width)
         new_height = int(float(image_height) * float(width_percent))
         return image.resize((IMAGE_WIDTH, new_height), Image.ANTIALIAS)
+
+    def code_in_place_filter(self):
+        copied_image = self.resized_image.copy()
+        pixels = np.array(copied_image).astype(np.float)
+        for x in range(copied_image.height):
+            for y in range(copied_image.width):
+                pixels[x, y, R] = self.clamp(pixels[x, y, R] * 1.5)
+                pixels[x, y, G] = self.clamp(pixels[x, y, G] * 0.7)
+                pixels[x, y, B] = self.clamp(pixels[x, y, B] * 1.5)
+
+        self.filtered_image = Image.fromarray(pixels.astype(np.uint8))
+        filtered_image_obj = ImageTk.PhotoImage(self.filtered_image)
+        self.final_image_label.configure(image=filtered_image_obj)
+        self.final_image_label.image = filtered_image_obj
+
+
+    def clamp(self, num):
+        num = int(num)
+        if num < 0:
+            return 0
+        if num >= 256:
+            return 255
+        return num
 
 
 def main():
