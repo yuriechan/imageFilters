@@ -3,21 +3,25 @@ from tkinter import filedialog
 from PIL import ImageTk, Image
 from filters import *
 import numpy as np
+import os
 
 IMAGE_WIDTH, IMAGE_HEIGHT = 400, 400
 R, G, B = 0, 1, 2
 
 class Application:
     def __init__(self, master):
-        self.select_image_btn = Button(master, text="Open finder", command=self.open_finder).place(relx="0.5", anchor=N)
-        self.code_in_place_filter_btn = Button(master, text="CodeInPlace", command=self.code_in_place_filter).place(relx="0.3", rely="0.9", anchor=N)
-
         self.master = master
         self.selected_image = None
         self.resized_image = None
         self.final_image = None
         self.final_image_label = None
         self.filtered_image = None
+        self.filtered_photo = None
+        self.saved_image_counter = 0
+
+        self.select_image_btn = Button(master, text="Open finder", command=self.open_finder).place(relx="0.5", anchor=N)
+        self.code_in_place_filter_btn = Button(master, text="CodeInPlace", command=self.code_in_place_filter).place(relx="0.3", rely="0.9", anchor=N)
+        self.save_filtered_image_btn = Button(master, text="Save", command=self.save_to_repo).place(relx="0.6", anchor=N)        
 
     def open_finder(self):
         self.master.filename = filedialog.askopenfilename(initialdir="/", title="Select your favorite picture", filetypes=(("png files", "*.png"),("jpg files", "*.jpg")))
@@ -46,9 +50,15 @@ class Application:
                 pixels[x, y, B] = self.clamp(pixels[x, y, B] * 1.5)
 
         self.filtered_image = Image.fromarray(pixels.astype(np.uint8))
-        filtered_image_obj = ImageTk.PhotoImage(self.filtered_image)
-        self.final_image_label.configure(image=filtered_image_obj)
-        self.final_image_label.image = filtered_image_obj
+        self.filtered_photo = ImageTk.PhotoImage(self.filtered_image)
+        self.final_image_label.configure(image=self.filtered_photo)
+        self.final_image_label.image = self.filtered_photo
+
+    def save_to_repo(self):
+        image_name = "image_" + str(self.saved_image_counter) + ".jpg"
+        file_path = os.path.join('filtered_image/', image_name)
+        self.filtered_image.save(file_path, "JPEG")
+        self.saved_image_counter += 1
 
 
     def clamp(self, num):
