@@ -5,17 +5,18 @@ from filters import *
 import numpy as np
 
 IMAGE_WIDTH, IMAGE_HEIGHT = 400, 400
-R = 0
-G = 1
-B = 2
-
+R, G, B = 0, 1, 2
 root = Tk()
 root.title("Image Filter")
 root.geometry("750x750")
 my_image = None
+final_image = None
+final_image_label = None
 
 def open_finder():
     global my_image
+    global final_image_label
+    global final_image
     root.filename = filedialog.askopenfilename(initialdir="/", title="Select your favorite picture", filetypes=(("png files", "*.png"),("jpg files", "*.jpg")))
     my_image = Image.open(root.filename)
     # Resize Image Calculation
@@ -37,7 +38,8 @@ def clamp(num):
     return num
 
 def code_in_place_filter():
-     print("You pressed Submit!")
+     global final_image_label
+     global final_image
      copied_image = my_image.copy()
      pixels = np.array(copied_image).astype(np.float)
      for x in range(copied_image.height):
@@ -47,12 +49,11 @@ def code_in_place_filter():
             pixels[x, y, B] = clamp(pixels[x, y, B] * 1.5)
 
      filtered_image = Image.fromarray(pixels.astype(np.uint8))
-     filtered_image.save("result.png")
+     ph = ImageTk.PhotoImage(filtered_image)
+     final_image_label.configure(image=ph)
+     final_image_label.image = ph
 
 
 my_btn = Button(root, text="Open finder", command=open_finder).place(relx="0.5", anchor=N)
 filter_btn = Button(root, text="CodeInPlace", command=code_in_place_filter).place(relx="0.3", rely="0.9", anchor=N)
-
-
-
 root.mainloop()
